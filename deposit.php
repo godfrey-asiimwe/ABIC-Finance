@@ -69,7 +69,7 @@ $financialYear=new FinancialYear();
           </div>
            <ul class="sidebar-menu">
               <li class="menu-header" style="font-weight: bold !important; ">Dashboard</li>
-                    <li><a class="nav-link" href="index.php"><i class="fas fa-bars"></i> <span>Dashboard</span></a></li>
+                    <li><a class="nav-link" href="incomestatement.php"><i class="fas fa-bars"></i> <span>Income Statement</span></a></li>
                       <li><a class="nav-link" href="financialYear.php"><i class="fas fa-bars"></i> <span>Financial Year</span></a></li>
               <li class="menu-header" style="font-weight: bold;">Accounts</li>
                     <li><a class="nav-link" href="organisation.php"><i class="far fa-user"></i> <span>Organisation</span></a></li>
@@ -129,7 +129,7 @@ $financialYear=new FinancialYear();
 
                         <tr>
                           <td>
-                            <?php echo $result[$k]["setup_date"]; ?>
+                            <?php echo date("Y-m-d",strtotime($result[$k]["entry_date"])); ?>
                           </td>
                           <td style="font-weight: bold;"> Ugx
                             <?php echo number_format($result[$k]["amount"]); ?>
@@ -173,7 +173,11 @@ $financialYear=new FinancialYear();
               <div class="modal-body">
 
                      <form id="deposit">
-                         <div class="form-group col-md-8 col-lg-8">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="date" class="form-control datemask col-md-8 col-lg-8" placeholder="YYYY/MM/DD">
+                        </div>
+                        <div class="form-group col-md-8 col-lg-8">
                           <label>Select Account</label>
                           <select class="form-control" id="account" name="account">
                             <?php $account->getAllAccountForSelection(); ?>
@@ -236,8 +240,7 @@ $financialYear=new FinancialYear();
 
  <script type = "text/javascript">
   $(document).ready(function(){
-     //displayResult();
-  /*  ADDING POST */  
+     //displayResult();  
     
     $('#add_deposit').on('click', function(){
 
@@ -247,7 +250,8 @@ $financialYear=new FinancialYear();
         
         $amount =$('#amount').val();
         $account =$('#account').val();
-        $desc= $('#desc').val();
+        $desc=$('#desc').val();
+        $date=$('#date').val();
         
         $.ajax({
           type: "POST",
@@ -256,6 +260,7 @@ $financialYear=new FinancialYear();
             amount:$amount,
             account:$account,
             desc:$desc,
+            date:$date,
             
           },
           success: function(){
@@ -263,6 +268,8 @@ $financialYear=new FinancialYear();
             $("#deposit")[0].reset();
 
             $("#result").load(" #result");
+
+            alert(" Successfully Saved");
             
             //displayResult();
           }

@@ -69,7 +69,7 @@ $financialYear=new FinancialYear();
           </div>
            <ul class="sidebar-menu">
               <li class="menu-header" style="font-weight: bold !important; ">Dashboard</li>
-                    <li><a class="nav-link" href="index.php"><i class="fas fa-bars"></i> <span>Dashboard</span></a></li>
+                    <li><a class="nav-link" href="incomestatement.php"><i class="fas fa-bars"></i> <span>Income Statement</span></a></li>
               <li class="menu-header" style="font-weight: bold;">Accounts</li>
                     <li><a class="nav-link" href="organisation.php"><i class="far fa-user"></i> <span>Organisation</span></a></li>
                     <li><a class="nav-link" href="accountType.php"><i class="fas fa-bars"></i> <span>Account Type</span></a></li>
@@ -127,7 +127,7 @@ $financialYear=new FinancialYear();
                         ?>
                         <tr>
                           <td>
-                            <?php echo $result[$k]["setup_date"]; ?>
+                            <?php echo date("Y-m-d",strtotime($result[$k]["entry_date"])); ?>
                           </td>
                            <td>
                             <?php $id=$result[$k]["expense_type"]; $resultExpense= $expenseType->getSpecificExpenseType($id,$con);  ?>
@@ -174,6 +174,10 @@ $financialYear=new FinancialYear();
               <div class="modal-body">
 
                      <form id="expense">
+                           <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="date" class="form-control datemask col-md-8 col-lg-8" placeholder="YYYY/MM/DD">
+                           </div>
                           <div class="form-group col-md-8 col-lg-8">
                           <label>Select expense Type</label>
                           <select class="form-control" name="expenseType" id="expenseType">
@@ -256,6 +260,7 @@ $financialYear=new FinancialYear();
         $account =$('#account').val();
         $desc= $('#desc').val();
         $expenseType=$('#expenseType').val();
+        $date=$('#date').val();
 
         
         $.ajax({
@@ -266,6 +271,7 @@ $financialYear=new FinancialYear();
             account:$account,
             desc:$desc,
             expenseType:$expenseType,
+            date:$date,
             
           },
           success: function(){
@@ -273,6 +279,8 @@ $financialYear=new FinancialYear();
             $("#expense")[0].reset();
 
             $("#result").load(" #result");
+
+            alert(" Successfully Saved");
             
             //displayResult();
           }

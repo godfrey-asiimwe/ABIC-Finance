@@ -9,16 +9,17 @@ class Deposit
         $this->db_handle = new DB();
     }
     
-    function addDeposit($setup_date,$acc,$amount,$des) {
+    function addDeposit($setup_date,$acc,$amount,$des,$date) {
 
-        $query = "INSERT INTO deposit(setup_date,account,amount,des) VALUES (?, ?, ?, ?)";
+        $query = "INSERT INTO deposit(setup_date,account,amount,des,entry_date) VALUES (?, ?, ?, ?,?)";
 
-        $paramType = "siis";
+        $paramType = "siiss";
         $paramValue = array(
             $setup_date,
             $acc,
             $amount,
-            $des
+            $des,
+            $date
         );
         
         $insertId = $this->db_handle->insert($query, $paramType, $paramValue);

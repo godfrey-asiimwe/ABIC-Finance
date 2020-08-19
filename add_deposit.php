@@ -14,8 +14,8 @@ $financialYear=new FinancialYear();
 
         $amount =$_POST['amount'];
         $acc=$_POST['account'];
-       
         $des=$_POST['desc'];
+        $date=$_POST['date'];
 
         $year=$financialYear->getActiveFinancialYear($con);
 
@@ -23,7 +23,7 @@ $financialYear=new FinancialYear();
         $setup_date=date("Y-m-d",$time); 
         
         $deposit = new Deposit();
-        $insertId = $deposit->addDeposit($setup_date,$acc,$amount,$des);
+        $insertId = $deposit->addDeposit($setup_date,$acc,$amount,$des,$date);
 
         $returnamount=new Account();
         $result=$returnamount->getAmountOnAccount($acc,$con);
@@ -36,7 +36,7 @@ $financialYear=new FinancialYear();
         $debit=0;
 
         $income=new IncomeStatement();
-        $incomeStatement=$income->addIncomeStatement($setup_date,$category,$year,$acc,$des,$debit,$amount,$amount2);
+        $incomeStatement=$income->addIncomeStatement($setup_date,$category,$year,$acc,$des,$debit,$amount,$amount2,$date);
 
     }
  ?>

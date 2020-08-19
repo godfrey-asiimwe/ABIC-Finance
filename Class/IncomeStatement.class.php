@@ -9,12 +9,12 @@ class IncomeStatement
         $this->db_handle = new DB();
     }
     
-    function addIncomeStatement($setup_date,$category,$year,$account,$name,$debit,$credit,$balance) {
+    function addIncomeStatement($setup_date,$category,$year,$account,$name,$debit,$credit,$balance,$date) {
 
-        $query = "INSERT INTO income_statement(setup_date,category,finacialYear,account,name,debit,credit,balance) VALUES (?, ?, ?, ?,?,?,?,?)";
+        $query = "INSERT INTO income_statement(setup_date,category,finacialYear,account,name,debit,credit,balance,entry_date) VALUES (?,?,?,?,?,?,?,?,?)";
 
-        $paramType = "sssssiii";
-        $paramValue = array(
+        $paramType ="sssssiiis";
+        $paramValue =array(
             $setup_date,
             $category,
             $year,
@@ -22,7 +22,8 @@ class IncomeStatement
             $name,
             $debit,
             $credit,
-            $balance
+            $balance,
+            $date
         );
         
         $insertId = $this->db_handle->insert($query, $paramType, $paramValue);
@@ -74,6 +75,7 @@ class IncomeStatement
                echo $data;
             }
         }
+
     }
     
     function getIncomeStatement() {
@@ -81,5 +83,6 @@ class IncomeStatement
         $result = $this->db_handle->runBaseQuery($sql);
         return $result;
     }
+
 }
 ?>

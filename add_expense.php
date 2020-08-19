@@ -21,6 +21,7 @@ require_once ("DB.php");
         $exp_type=$_POST['expenseType'];
         $acc=$_POST['account'];
         $desc=$_POST['desc'];
+        $date=$_POST['date'];
 
        
         $year=$financialYear->getActiveFinancialYear($con);
@@ -49,7 +50,7 @@ require_once ("DB.php");
         }else{
 
         $expense = new Expense();
-        $insertId = $expense->addExpense($setup_date,$exp_type,$acc,$amount,$desc);
+        $insertId = $expense->addExpense($setup_date,$exp_type,$acc,$amount,$desc,$date);
         
         $accountUpdate=$returnamount->editAccountAmount($amount2,$acc);
 
@@ -57,7 +58,7 @@ require_once ("DB.php");
         $credit=0;
 
         $income=new IncomeStatement();
-        $incomeStatement=$income->addIncomeStatement($setup_date,$category,$year,$acc,$desc,$amount,$credit,$amount2);
+        $incomeStatement=$income->addIncomeStatement($setup_date,$category,$year,$acc,$desc,$amount,$credit,$amount2,$date);
 
         }
 

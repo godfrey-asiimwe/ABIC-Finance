@@ -947,8 +947,8 @@ select.form-control:not([size]):not([multiple]) {
 table tr:hover .table-links {
   opacity: 1; }
 
-.table-striped tbody tr:nth-of-type(odd) {
-  background-color: rgba(0, 0, 0, 0.02); }
+.table-striped tbody tr:nth-of-type(odd) {/*
+  background-color: rgba(0, 0, 0, 0.02); */}
 
 @media (max-width: 575.98px) {
   .table-responsive table {

@@ -59,7 +59,7 @@ require_once ("Class/accountType.class.php");
           </div>
            <ul class="sidebar-menu">
               <li class="menu-header" style="font-weight: bold !important; ">Dashboard</li>
-                    <li><a class="nav-link" href="index.php"><i class="fas fa-bars"></i> <span>Dashboard</span></a></li>
+                    <li><a class="nav-link" href="incomestatement.php"><i class="fas fa-bars"></i> <span>Income Statement</span></a></li>
                     <li><a class="nav-link" href="financialYear.php"><i class="fas fa-bars"></i> <span>Financial Year</span></a></li>
               <li class="menu-header" style="font-weight: bold;">Accounts</li>
                     <li><a class="nav-link" href="organisation.php"><i class="far fa-user"></i> <span>Organisation</span></a></li>
@@ -233,6 +233,8 @@ require_once ("Class/accountType.class.php");
             $("#accountType")[0].reset();
 
             $("#result").load(" #result");
+
+            alert(" Successfully Saved");
             
             //displayResult();
           }

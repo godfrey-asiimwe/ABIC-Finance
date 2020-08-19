@@ -88,5 +88,32 @@ class ExpenseType
             }
         }
     }
+
+    function getExp_Type_GraphDisplay($con) {
+        $sql = "SELECT * FROM expenseType ORDER BY id";
+        $result = $this->db_handle->runBaseQuery($sql);
+
+          if (! empty($result)) {
+            foreach ($result as $k => $v) {
+                $exp_Type_id=$result[$k]["id"];
+                $expenseTye=$result[$k]["name"];
+
+                $totalsum=mysqli_query($con,"SELECT SUM(amount) AS total FROM expense WHERE expense_type='$exp_Type_id'");
+                $d=mysqli_fetch_assoc($totalsum);
+                $totalAmount=$d['total'];
+
+                echo "['".$expenseTye."', ".$totalAmount."],"; 
+
+            }
+        }
+    }
+
+    function getExpenseSumByType($exp_Type_id){
+
+        $totalsum=mysqli_query(db_connection(),"SELECT SUM(amount) AS total FROM expense WHERE expense_type='$exp_Type_id'");
+        $d=mysqli_fetch_assoc($totalsum);
+        return $d['total'];
+
+    }
 }
 ?>

@@ -1,7 +1,6 @@
 <?php 
 require_once ("Class/DB.class.php");
 require_once ("Class/Organisation.class.php");
-
 ?>
 
 <!DOCTYPE html>
@@ -68,7 +67,7 @@ require_once ("Class/Organisation.class.php");
           </div>
            <ul class="sidebar-menu">
               <li class="menu-header" style="font-weight: bold !important; ">Dashboard</li>
-                    <li><a class="nav-link" href="index.php"><i class="fas fa-bars"></i> <span>Dashboard</span></a></li>
+                    <li><a class="nav-link" href="incomestatement.php"><i class="fas fa-bars"></i> <span>Income Statement</span></a></li>
                       <li><a class="nav-link" href="financialYear.php"><i class="fas fa-bars"></i> <span>Financial Year</span></a></li>
               <li class="menu-header" style="font-weight: bold;">Accounts</li>
                     <li><a class="nav-link" href="organisation.php"><i class="far fa-user"></i> <span>Organisation</span></a></li>
@@ -132,8 +131,7 @@ require_once ("Class/Organisation.class.php");
                             <?php echo $result[$k]["des"]; ?>
                           </td>
                           <td>
-                            <a class="btn btn-primary btn-action mr-1" data-toggle="tooltip" title="Edit" href="index.php?action=student-edit&id=<?php echo $result[$k]["id"]; ?>"><i class="fas fa-pencil-alt"></i></a>
-                            <a href="index.php?action=student-edit&id=<?php echo $result[$k]["id"]; ?>" class="btn btn-danger btn-action" data-toggle="tooltip" title="Delete"  data-confirm="Are You Sure?|This action can not be undone. Do you want to continue?" data-confirm-yes="alert('Deleted')"><i class="fas fa-trash"></i></a>
+                            <a class="btn btn-primary btn-action mr-1 edit_data" data-toggle="tooltip" title="Edit" name="edit" value="Edit" id="<?php echo $result[$k]["id"]; ?>"><i class="fas fa-pencil-alt"></i></a>
                           </td>
                         </tr>
                     <?php
@@ -173,8 +171,8 @@ require_once ("Class/Organisation.class.php");
                           <label>Description</label>
                           <textarea name="desc" id="desc" class="form-control"></textarea>
                         </div>
-                         <button type="button" style="color: white;" id="add_post"   class="btn btn-primary daterange-btn icon-left btn-icon"><i class="fas fa-calendar"></i> Save
-                          </button> 
+                        <input type="hidden" name="id" id="id" /> 
+                         <input type="button" style="color: white;" id="add_post"   class="btn btn-primary daterange-btn icon-left btn-icon" value="save">
                     </form>
 
 
@@ -234,6 +232,7 @@ require_once ("Class/Organisation.class.php");
         */
         $name = $('#name').val();
         $desc= $('#desc').val();
+        $id=$('#id').val();
         
         $.ajax({
           type: "POST",
@@ -241,13 +240,15 @@ require_once ("Class/Organisation.class.php");
           data: {
             name: $name,
             desc: $desc,
-            
+            id:$id,
           },
           success: function(){
 
             $("#organisation")[0].reset();
 
             $("#result").load(" #result");
+
+            alert(" Successfully Saved");
             
             //displayResult();
           }
@@ -256,20 +257,39 @@ require_once ("Class/Organisation.class.php");
     });
   /*****  *****/
   });
-  
-  function displayResult(){
-    $.ajax({
-      url: 'add_post.php',
-      type: 'POST',
-      async: false,
-      data:{
-        res: 1
-      },
-      success: function(response){
-        $('#result').html(response);
-      }
-    });
-  }
+
+  $(document).on('click', '.edit_data', function(){  
+
+   var organisation_id = $(this).attr("id");  
+   $.ajax({  
+        url:"fetch.php",  
+        method:"POST",  
+        data:{id:organisation_id},  
+        dataType:"json",  
+        success:function(data){  
+             $('#name').val(data.name);  
+             $('#desc').val(data.des);
+             $('#id').val(data.id);
+             $('#add_post').val("Update");  
+             $('#logoutModal').modal('show');  
+        }  
+   }); 
+
+});
+
+function displayResult(){
+  $.ajax({
+    url: 'add_post.php',
+    type: 'POST',
+    async: false,
+    data:{
+      res: 1
+    },
+    success: function(response){
+      $('#result').html(response);
+    }
+  });
+}
   
 </script>
 

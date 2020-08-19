@@ -1,8 +1,32 @@
 <?php 
-require_once ("Class/DB.class.php");
-require_once ("Class/FinancialYear.class.php");
-?>
 
+// We need to use sessions, so you should always start sessions using the below code.
+session_start();
+
+// If the user is not logged in redirect to the login page...
+if (!isset($_SESSION['loggedin'])) {
+  header('Location:login.php');
+  exit;
+}
+
+require_once ("Class/DB.class.php");
+require_once ("Class/IncomeStatement.class.php");
+require_once ("DB.php");
+require_once ("Class/Account.class.php");
+require_once ("Class/FinancialYear.class.php");
+require_once ("Class/ExpenseType.class.php");
+require_once ("DB.php");
+
+
+$check=mysqli_query($con,"SELECT username FROM users") or die(mysqli_error());
+if(mysqli_num_rows($check)==0){
+    $username='admin';
+    $password=sha1('Pass=123');
+    @mysqli_query($con,"INSERT INTO users(username,password) VALUES('$username','$password')") OR die(mysqli_error());
+}
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,6 +38,10 @@ require_once ("Class/FinancialYear.class.php");
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>  
+
+   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
   <!-- CSS Libraries -->
   <link rel="stylesheet" href="../node_modules/jqvmap/dist/jqvmap.min.css">
   <link rel="stylesheet" href="../node_modules/summernote/dist/summernote-bs4.css">
@@ -22,22 +50,35 @@ require_once ("Class/FinancialYear.class.php");
 
   <!-- Template CSS -->
   <link rel="stylesheet" href="assets/css/style.css">
+<!--   <link rel="stylesheet" href="assets/css/bootstrap.css"> -->
+   <link rel="stylesheet" href="assets/css/dataTables.bootstrap4.min.css">
   <link rel="stylesheet" href="assets/css/components.css">
 
-  <!-- Template CSS -->
-   <link rel="stylesheet" href="assets/css/dataTables.bootstrap4.min.css">
-  <script>
-    function myFunction() {
 
-      var x = document.getElementById("financial");
-      if (x.style.display === "none") {
-        x.style.display = "block";
-      } else {
-        x.style.display = "none";
+  <script type="text/javascript">
+      google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Expense', 'Amount'],
+          <?php 
+            $expense = new ExpenseType();
+            $result = $expense->getExp_Type_GraphDisplay($con);
+          ?>
+        ]);
+
+        var options = {
+          title: 'Expenses',
+          pieHole: 0.4,
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+        chart.draw(data, options);
       }
-      
-    }
-  </script>
+    </script>
+
+  
+
 </head>
 
 <body>
@@ -55,13 +96,13 @@ require_once ("Class/FinancialYear.class.php");
       <div class="main-sidebar">
         <aside id="sidebar-wrapper">
           <div class="sidebar-brand">
-            <a href="index.php">PT Finance</a>
+            <a href="index.php"><img src="assets/img/logo.png" style="width: 70px;margin-top: 20px;margin-bottom: 20px;margin-left: -50px;"></a>
           </div>
           <div class="sidebar-brand sidebar-brand-sm">
             <a href="index.php">PTF</a>
           </div>
-           <ul class="sidebar-menu">
-              <li class="menu-header" style="font-weight: bold !important; ">Dashboard</li>
+          <ul class="sidebar-menu" style="margin-top: 20px;">
+              <li class="menu-header" style="font-weight: bold !important; "></li>
                     <li><a class="nav-link" href="incomestatement.php"><i class="fas fa-bars"></i> <span>Income Statement</span></a></li>
                       <li><a class="nav-link" href="financialYear.php"><i class="fas fa-bars"></i> <span>Financial Year</span></a></li>
               <li class="menu-header" style="font-weight: bold;">Accounts</li>
@@ -69,8 +110,8 @@ require_once ("Class/FinancialYear.class.php");
                     <li><a class="nav-link" href="accountType.php"><i class="fas fa-bars"></i> <span>Account Type</span></a></li>
                     <li><a class="nav-link" href="account.php"><i class="far fa-user"></i> <span>Account</span></a></li>
               <li class="menu-header" style="font-weight: bold;">Deposits</li>
-                    <li><a class="nav-link" href="deposit.php" ><i class="fas fa-dollar-sign"></i> <span>Deposit</span></a></li>
-             <li class="menu-header" style="font-weight: bold;">Expenses</li>
+                    <li><a class="nav-link" href="deposit.php"><i class="fas fa-dollar-sign"></i> <span>Deposit</span></a></li>
+              <li class="menu-header" style="font-weight: bold;">Expenses</li>
                     <li><a class="nav-link" href="expenseType.php"><i class="fas fa-bars"></i> <span>Expense Category</span></a></li>
                     <li><a class="nav-link" href="expense.php"><i class="fas fa-dollar-sign"></i> <span>Expense</span></a></li>
             </ul>
@@ -80,109 +121,89 @@ require_once ("Class/FinancialYear.class.php");
       <!-- Main Content -->
       <div class="main-content">
         <section class="section">
-          <div class="row">
-            
-          </div><br><br><br>
-
-          <div class="section-body">
-            <h2 class="section-title">Financial Year</h2>
+            <h2 class="section-title">Income Statement</h2>
             <p class="section-lead">We provide advanced input fields, such as date picker, color picker, and so on.</p>
-          </div>
 
-            <div class="row">
+          <div class="row">
               <div class="col-lg-12 col-md-12 col-12 col-sm-12">
               <div class="card">
                 <div class="card-header">
-                  <h4>Financial Year</h4>
-                   <div class="card-header-action">
-                    <button   data-toggle="modal" data-target="#logoutModal" class="dropdown-item has-icon text-danger btn btn-primary" style="color: white !important;" class="btn btn-primary">Add Finincial Year</buttoon>
+                  <div class="card-header-action">
+                    <a onclick="exportTableToExcel('example', 'IncomeStatement')" style="color: white !important" class="btn btn-primary">Export Table Data To Excel File</a>
                   </div>
                 </div>
-                <div class="card-body p-0" id="result">
+                <div class="card-body p-0">
                   <div class="table-responsive">
-                    <table id="example" class="table table-striped table-bordered mb-0" style="width:100%; padding:10px !important;">
+                    
+                    <table  id="example" class="table table-striped table-bordered mb-0" style="width:100%; padding: 50px !important;">
                       <thead>
                         <tr>
-                          <th>Name</th>
+                          <th>Date </th>
+                          <th>Fin. Year </th>
                           <th>Description</th>
-                          <th>Status</th>
-                          <th>Action</th>
+                          <th>Account</th>
+                          <th>Debit (Ugx)</th>
+                          <th>Credit (Ugx)</th>
+                          <th>Balance (Ugx)</th>
                         </tr>
                       </thead>
                       <tbody>
                         <?php
-                        $financialYear = new FinancialYear();
-                        $result = $financialYear->getAllfinancialYears();
 
-                    if (! empty($result)) {
+                        $IncomeStatement = new IncomeStatement();
+                        $result = $IncomeStatement->getIncomeStatement();
+
+                        $account = new Account();
+
+                        $financialYear=new FinancialYear();
+
+                      if (! empty($result)) {
                         foreach ($result as $k => $v) {
                         ?>
-
-                        <tr>
+                        <tr id="category">
                           <td>
-                            <?php echo $result[$k]["name"]; ?>
+                            <?php echo date("Y-m-d",strtotime($result[$k]["entry_date"])); ?>
                           </td>
-                          <td>
-                            <?php echo $result[$k]["des"]; ?>
+                           <td>
+                            <?php $id=$result[$k]["finacialYear"]; $year = $financialYear->getSpecificfinancialYear($id,$con);  ?>
                           </td>
-                            <td>
-                            <?php echo $result[$k]["status"]; ?>
+                           <td>
+                            <?php echo $result[$k]["name"];  ?>
                           </td>
-                          <td>
-                             <a class="btn btn-primary btn-action mr-1 edit_data" data-toggle="tooltip" title="Edit" name="edit" value="Edit" id="<?php echo $result[$k]["id"]; ?>"><i class="fas fa-pencil-alt"></i></a>
+                           <td>
+                            <?php $id=$result[$k]["account"]; $resultAccount = $account->getSpecificAccount($id,$con);  ?>
+                          </td>
+                          <td style="font-weight: bolder;">
+                            <?php echo number_format($result[$k]["debit"]); ?>
+                          </td>
+                          <td style="font-weight: bolder;">
+                            <?php echo number_format($result[$k]["credit"]); ?>
+                          </td>
+                          <td style="font-weight: bolder;">
+                            <?php echo number_format($result[$k]["balance"]); ?>
                           </td>
                         </tr>
+                        
                     <?php
                         }
                     }
                     ?>
                       </tbody>
+                      
                     </table>
+
                   </div>
                 </div>
               </div>
-            </div>
-            </div>
-
-
+          </div>
+          </div>
         </section>
       </div>
-
-        <!-- Logout Modal-->
-        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Adding Financial Year </h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div class="modal-body">
-
-                  <form id="financialYear">
-                      <div class="form-group col-md-12 col-lg-12">
-                        <label>Name</label>
-                        <input type="text" name="name" id="name" class="form-control">
-                      </div>
-                       <div class="form-group col-md-12 col-lg-12">
-                        <label>Description</label>
-                        <textarea  id="desc" name="desc" class="form-control"></textarea>
-                      </div>
-                       <input type="hidden" name="id" id="year_id" value="" /> 
-                      <input type="button" style="color: white;" id="add_year"   class="btn btn-primary daterange-btn icon-left btn-icon" value="save"> 
-                  </form>
-                  
-              </div>
-            </div>
-          </div>
-        </div>
-
       <footer class="main-footer">
-        <div class="footer-left">
+        <div class="footer-left footer-color">
           Copyright &copy; 2020 <div class="bullet"></div> Design By Godfrey Asiimwe</a>
         </div>
-        <div class="footer-right">
+        <div class="footer-right footer-color">
           Vr 1.0
         </div>
       </footer>
@@ -190,6 +211,7 @@ require_once ("Class/FinancialYear.class.php");
   </div>
 
   <!-- General JS Scripts -->
+ <!--  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script> -->
   <script src="assets/js/jquery-3.5.1.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
@@ -205,79 +227,48 @@ require_once ("Class/FinancialYear.class.php");
 
       } );
   </script>
+  <script>  
+ $(document).ready(function(){  
+      $('#create_excel').click(function(){  
+           var excel_data = $('#example').html();  
+           var page = "excel.php?data=" + excel_data;  
+           window.location = page;  
+      });  
+ });  
+ </script> 
 
-  <script type = "text/javascript">
-  $(document).ready(function(){
-  //displayResult();
-  /*  ADDING POST */  
+ <script type="text/javascript">
+   function exportTableToExcel(example, filename = ''){
+    var downloadLink;
+    var dataType = 'application/vnd.ms-excel';
+    var tableSelect = document.getElementById(example);
+    var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
     
-    $('#add_year').on('click', function(){
-    if($('#name').val() == ""){
-        alert('Please enter name first');
-      }else{
-        
-        $name = $('#name').val();
-        $desc= $('#desc').val();
-        $id=$('#year_id').val();
-        
-        $.ajax({
-          type: "POST",
-          url: "add_year.php",
-          data: {
-            name: $name,
-            desc: $desc,
-            id:$id,
-            
-          },
-          success: function(){
-
-            $("#financialYear")[0].reset();
-
-            $("#result").load(" #result");
-
-            alert(" Successfully Saved");
-
-          }
+    // Specify file name
+    filename = filename?filename+'.xls':'excel_data.xls';
+    
+    // Create download link element
+    downloadLink = document.createElement("a");
+    
+    document.body.appendChild(downloadLink);
+    
+    if(navigator.msSaveOrOpenBlob){
+        var blob = new Blob(['\ufeff', tableHTML], {
+            type: dataType
         });
-      } 
-    });
-  });
-
-  $(document).on('click', '.edit_data', function(){  
-
-   var year_id = $(this).attr("id");  
-   $.ajax({  
-        url:"fetch.php",  
-        method:"POST",  
-        data:{id:year_id},  
-        dataType:"json",  
-        success:function(data){  
-             $('#name').val(data.name);  
-             $('#desc').val(data.des);
-             $('#year_id').val(data.id);
-             $('#add_year').val("Update");  
-             $('#logoutModal').modal('show');  
-        }  
-   }); 
-
-  });
-  
-  function displayResult(){
-    $.ajax({
-      url: 'add_year.php',
-      type: 'POST',
-      async: false,
-      data:{
-        res: 1
-      },
-      success: function(response){
-        $('#result').html(response);
-      }
-    });
-  }
-  
-</script>
-
+        navigator.msSaveOrOpenBlob( blob, filename);
+    }else{
+        // Create a link to the file
+        downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+    
+        // Setting the file name
+        downloadLink.download = filename;
+        
+        //triggering the function
+        downloadLink.click();
+    }
+}
+ </script>
 
   <!-- JS Libraies -->
   <script src="node_modules/jquery-sparkline/jquery.sparkline.min.js"></script>

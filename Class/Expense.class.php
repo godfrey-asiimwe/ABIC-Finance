@@ -9,17 +9,18 @@ class Expense
         $this->db_handle = new DB();
     }
     
-    function addExpense($setup_date,$exp_type,$account,$amount,$desc) {
+    function addExpense($setup_date,$exp_type,$account,$amount,$desc,$date) {
 
-        $query = "INSERT INTO expense(setup_date,expense_type,account,amount,des) VALUES (?, ?, ?, ?,?)";
+        $query = "INSERT INTO expense(setup_date,expense_type,account,amount,des,entry_date) VALUES (?, ?, ?, ?,?,?)";
 
-        $paramType = "siiis";
+        $paramType = "siiiss";
         $paramValue = array(
             $setup_date,
             $exp_type,
             $account,
             $amount,
-            $desc
+            $desc,
+            $date
         );
         
         $insertId = $this->db_handle->insert($query, $paramType, $paramValue);

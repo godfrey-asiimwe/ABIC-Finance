@@ -17,14 +17,12 @@ require_once ("Class/FinancialYear.class.php");
 require_once ("Class/ExpenseType.class.php");
 require_once ("DB.php");
 
-
 $check=mysqli_query($con,"SELECT username FROM users") or die(mysqli_error());
 if(mysqli_num_rows($check)==0){
     $username='admin';
     $password=sha1('Pass=123');
     @mysqli_query($con,"INSERT INTO users(username,password) VALUES('$username','$password')") OR die(mysqli_error());
 }
-
 
 ?>
 <!DOCTYPE html>
@@ -138,7 +136,8 @@ if(mysqli_num_rows($check)==0){
                     <table  id="example" class="table table-striped table-bordered mb-0" style="width:100%; padding: 50px !important;">
                       <thead>
                         <tr>
-                          <th>Date </th>
+                          <th>Entry Date</th>
+                          <th>Activity Date </th>
                           <th>Fin. Year </th>
                           <th>Description</th>
                           <th>Account</th>
@@ -161,6 +160,9 @@ if(mysqli_num_rows($check)==0){
                         foreach ($result as $k => $v) {
                         ?>
                         <tr id="category">
+                          <td>
+                            <?php echo date("Y-m-d",strtotime($result[$k]["setup_date"])); ?>
+                          </td>
                           <td>
                             <?php echo date("Y-m-d",strtotime($result[$k]["entry_date"])); ?>
                           </td>

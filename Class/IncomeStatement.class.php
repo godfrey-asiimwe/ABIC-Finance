@@ -79,7 +79,7 @@ class IncomeStatement
     }
     
     function getIncomeStatement() {
-        $sql = "SELECT * FROM income_statement ORDER BY id";
+        $sql = "SELECT * FROM income_statement ORDER BY setup_date ASC";
         $result = $this->db_handle->runBaseQuery($sql);
         return $result;
     }
